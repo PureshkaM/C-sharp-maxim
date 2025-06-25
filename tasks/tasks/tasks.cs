@@ -24,6 +24,23 @@
 
 
 
+/*Добавить в программу из «Задания 2» дополнительный функционал. Помимо обработанной строки, необходимо также возвращать пользователю информацию о том, 
+ * сколько раз повторялся каждый символ в обработанной строке.
+
+Результат программы:
+
+Если не подходящая строка:
+
+Сообщение об ошибке с информацией
+
+Если подходящая строка:
+
+Обработанная строка
+
+Информация о том, сколько раз входил в обработанную строку каждый символ*/
+
+
+
 public class StringProcessor
 {
     public static void Main(string[] args)
@@ -41,6 +58,8 @@ public class StringProcessor
         {
             string result = Process(input);
             Console.WriteLine("Результат: " + result);
+            Console.WriteLine("Статистика повторов символов:");
+            PrintCharacterFrequencies(result);
         }
     }
 
@@ -75,5 +94,23 @@ public class StringProcessor
         char[] chars = text.ToCharArray();
         Array.Reverse(chars);
         return new string(chars);
+    }
+
+    private static void PrintCharacterFrequencies(string text)
+    {
+        var frequencies = new Dictionary<char, int>();
+
+        foreach (char c in text)
+        {
+            if (frequencies.ContainsKey(c))
+                frequencies[c]++;
+            else
+                frequencies[c] = 1;
+        }
+
+        foreach (var pair in frequencies.OrderBy(p => p.Key))
+        {
+            Console.WriteLine($"'{pair.Key}': {pair.Value} раз(а)");
+        }
     }
 }
