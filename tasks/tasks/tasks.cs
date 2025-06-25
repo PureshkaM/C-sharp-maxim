@@ -41,6 +41,25 @@
 
 
 
+/*Добавить в программу из «Задания 3» дополнительный функционал. Помимо обработки строки и подсчёта количества вхождений 
+ * каждого символа, необходимо найти в обработанной строке наибольшую подстроку, которая начинается и заканчивается на гласную букву из «aeiouy»
+
+Результат программы:
+
+Если не подходящая строка:
+
+Сообщение об ошибке с информацией
+
+Если подходящая строка:
+
+Обработанная строка
+
+Информация о том, сколько раз входил в обработанную строку каждый символ
+
+Самая длинная подстрока начинающаяся и заканчивающаяся на гласную*/
+
+
+
 public class StringProcessor
 {
     public static void Main(string[] args)
@@ -58,8 +77,12 @@ public class StringProcessor
         {
             string result = Process(input);
             Console.WriteLine("Результат: " + result);
+
             Console.WriteLine("Статистика повторов символов:");
             PrintCharacterFrequencies(result);
+
+            string vowelSubstring = FindLongestVowelSubstring(result);
+            Console.WriteLine("Самая длинная подстрока, начинающаяся и заканчивающаяся на гласную: " + vowelSubstring);
         }
     }
 
@@ -112,5 +135,34 @@ public class StringProcessor
         {
             Console.WriteLine($"'{pair.Key}': {pair.Value} раз(а)");
         }
+    }
+
+    private static string FindLongestVowelSubstring(string text)
+    {
+        string vowels = "aeiouy";
+        int maxLen = 0;
+        int startIdx = -1;
+
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (vowels.Contains(text[i]))
+            {
+                for (int j = text.Length - 1; j > i; j--)
+                {
+                    if (vowels.Contains(text[j]))
+                    {
+                        int len = j - i + 1;
+                        if (len > maxLen)
+                        {
+                            maxLen = len;
+                            startIdx = i;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        return maxLen > 0 ? text.Substring(startIdx, maxLen) : "(нет подходящей подстроки)";
     }
 }
