@@ -60,6 +60,27 @@
 
 
 
+/*Добавить в программу из «Задания 4» дополнительный функционал. Помимо всех предыдущих результатов необходимо также возвращать отсортированную обработанную строку. 
+ * Должно быть реализовано два алгоритма сортировки – Быстрая сортировка (Quicksort) и Сортировка деревом (Tree sort). Текущий алгоритм сортировки должен выбираться пользователем.
+
+Результат программы:
+
+Если не подходящая строка:
+
+Сообщение об ошибке с информацией
+
+Если подходящая строка:
+
+Обработанная строка
+
+Информация о том, сколько раз входил в обработанную строку каждый символ
+
+Самая длинная подстрока начинающаяся и заканчивающаяся на гласную
+
+Отсортированная обработанная строка*/
+
+
+
 public class StringProcessor
 {
     public static void Main(string[] args)
@@ -83,6 +104,12 @@ public class StringProcessor
 
             string vowelSubstring = FindLongestVowelSubstring(result);
             Console.WriteLine("Самая длинная подстрока, начинающаяся и заканчивающаяся на гласную: " + vowelSubstring);
+
+            Console.Write("Выберите алгоритм сортировки (1 - Быстрая сортировка, 2 - Сортировка деревом): ");
+            string choice = Console.ReadLine();
+            string sorted = choice == "2" ? TreeSort(result) : QuickSort(result);
+
+            Console.WriteLine("Отсортированная обработанная строка: " + sorted);
         }
     }
 
@@ -164,5 +191,87 @@ public class StringProcessor
         }
 
         return maxLen > 0 ? text.Substring(startIdx, maxLen) : "(нет подходящей подстроки)";
+    }
+
+    private static string QuickSort(string text)
+    {
+        char[] array = text.ToCharArray();
+        QuickSortRecursive(array, 0, array.Length - 1);
+        return new string(array);
+    }
+
+    private static void QuickSortRecursive(char[] array, int left, int right)
+    {
+        if (left >= right) return;
+
+        int pivotIndex = Partition(array, left, right);
+        QuickSortRecursive(array, left, pivotIndex - 1);
+        QuickSortRecursive(array, pivotIndex + 1, right);
+    }
+
+    private static int Partition(char[] array, int left, int right)
+    {
+        char pivot = array[right];
+        int i = left - 1;
+
+        for (int j = left; j < right; j++)
+        {
+            if (array[j] <= pivot)
+            {
+                i++;
+                (array[i], array[j]) = (array[j], array[i]);
+            }
+        }
+
+        (array[i + 1], array[right]) = (array[right], array[i + 1]);
+        return i + 1;
+    }
+
+    private class TreeNode
+    {
+        public char Value;
+        public TreeNode Left;
+        public TreeNode Right;
+
+        public TreeNode(char value)
+        {
+            Value = value;
+        }
+
+        public void Insert(char value)
+        {
+            if (value <= Value)
+            {
+                if (Left == null) Left = new TreeNode(value);
+                else Left.Insert(value);
+            }
+            else
+            {
+                if (Right == null) Right = new TreeNode(value);
+                else Right.Insert(value);
+            }
+        }
+
+        public void InOrder(List<char> result)
+        {
+            Left?.InOrder(result);
+            result.Add(Value);
+            Right?.InOrder(result);
+        }
+    }
+
+    private static string TreeSort(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+
+        TreeNode root = new TreeNode(text[0]);
+        for (int i = 1; i < text.Length; i++)
+        {
+            root.Insert(text[i]);
+        }
+
+        List<char> sorted = new List<char>();
+        root.InOrder(sorted);
+        return new string(sorted.ToArray());
     }
 }
