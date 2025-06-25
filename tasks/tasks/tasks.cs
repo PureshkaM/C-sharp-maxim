@@ -83,7 +83,7 @@
 
 public class StringProcessor
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         Console.Write("Введите строку: ");
         string input = Console.ReadLine();
@@ -110,6 +110,10 @@ public class StringProcessor
             string sorted = choice == "2" ? TreeSort(result) : QuickSort(result);
 
             Console.WriteLine("Отсортированная обработанная строка: " + sorted);
+
+            int randomIndex = await GetRandomIndexAsync(result.Length);
+            string shortened = RemoveCharAt(result, randomIndex);
+            Console.WriteLine($"\"Урезанная\" обработанная строка (удалён символ по индексу {randomIndex}): {shortened}");
         }
     }
 
@@ -274,4 +278,37 @@ public class StringProcessor
         root.InOrder(sorted);
         return new string(sorted.ToArray());
     }
+
+    private static async Task<int> GetRandomIndexAsync(int max)
+    {
+        try
+        {
+            using HttpClient client = new HttpClient();
+            string url = $"http://www.randomnumberapi.com/api/v1.0/random?min=0&max={max - 1}&count=1";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            string content = await response.Content.ReadAsStringAsync();
+
+            var numbers = System.Text.Json.JsonSerializer.Deserialize<int[]>(content);
+            if (numbers != null && numbers.Length > 0)
+            {
+                Console.WriteLine("Получено случайное число через API.");
+                return numbers[0];
+            }
+
+            throw new Exception("Неверный формат ответа API");
+        }
+        catch
+        {
+            Console.WriteLine("Не удалось получить случайное число через API. Используется локальный генератор.");
+            return new Random().Next(0, max);
+        }
+    }
+
+    private static string RemoveCharAt(string text, int index)
+    {
+        return text.Remove(index, 1);
+    }
 }
+
